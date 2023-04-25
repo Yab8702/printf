@@ -26,16 +26,17 @@ int print_binary_helper(unsigned int n)
 /**
  * print_binary - prints a decimal (base 10) integer as a binary number
  * @args: the argument to print
- *
+ * @f: pointer to struct flags
  * Return: the number of characters printed
  */
 
 
-int print_binary(va_list args)
+int print_binary(va_list args, flags_t *f)
 {
 	unsigned int n = va_arg(args, unsigned int);
 	int len = 0;
 
+	(void)f;
 	if (n / 2)
 		len += print_binary_helper(n / 2);
 	_putchar((n % 2) + '0');

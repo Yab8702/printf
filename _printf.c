@@ -12,40 +12,36 @@ int _printf(const char *format, ...)
 {
 	va_list args;
 	int count = 0;
-	int (*f)(va_list);
+	const char *ptr;
+	int (*f)(va_list, flags_t *);
+	flags_t flags = {0, 0, 0};
 
 	va_start(args, format);
-	if (format == NULL)
+	if (!format || (format[0] == '%' && !format[1]))
 		return (-1);
-	while (*format)
+	if (format[0] == '%' && format[1] == ' ' && !format[2])
+		return (-1);
+	for (ptr = format; *ptr; ptr++)
 	{
-		if (*format == '%')
+		if (*ptr == '%')
 		{
-			format++;
-			if (*format == '\0')
-				return (-1);
-			f = format_handler(format);
-			if (f != NULL)
-				count += f(args);
-			else if (*format != '\0')
+			ptr++;
+			if (*ptr == '%')
 			{
 				count += _putchar('%');
-				if (*format == '\n')
-				{
-					_putchar('\n');
-					count++;
-				}
-				else
-					count += _putchar(*format);
+				continue;
 			}
+			while (get_flag(*ptr, &flags))
+				ptr++;
+			f = format_handler(*ptr);
+			count += (f)
+				? f(args, &flags)
+				: _printf("%%%c", *ptr);
 		}
 		else
-		{
-			write(1, format, 1);
-			count++;
-		}
-		format++;
+			count += _putchar(*ptr);
 	}
+	_putchar(-1);
 	va_end(args);
 	return (count);
 }

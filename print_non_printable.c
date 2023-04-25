@@ -24,43 +24,56 @@ int print_str(char *str)
 /**
   * print_hex_n - print the corresponding hex value
   * @num: the non+prinable character
-  * Return: @count printed
+  * @B: base
+  * @lcase:lowercase
+  * Return: @ptr pointer
   */
 
-int print_hex_n(unsigned int num)
+char *print_hex_n(unsigned long int num, int B, int lcase)
 {
-	char hex_num[3] = {'\0'};
-	int count = 0;
-	char hex[17] = "0123456789ABCDEF";
+	static char *p;
+	static char buff[50];
+	char *ptr;
 
-	hex_num[0] = hex[(num >> 4) & 0xF];
-	hex_num[1] = hex[num & 0xF];
-	count += print_str(hex_num);
-	return (count);
+	p = (lcase)
+		? "0123456789abcdef"
+		: "0123456789ABCDEF";
+	ptr = &(buff[49]);
+	*ptr = '\0';
+	do {
+		*--ptr = p[num % B];
+		num /= B;
+	} while (num != 0);
+
+	return (ptr);
 }
 
 /**
   * print_non_printable - print non printable
   * @args: argument list
+  * @f: pointer to struct flags
   * Return: @count non_printable
   */
 
-int print_non_printable(va_list args)
+int print_non_printable(va_list args, flags_t *f)
 {
 	int count = 0, i;
 	char *str = va_arg(args, char *);
-	char hex[3];
+	char *hex;
 
+	(void)f;
+	if (!str)
+		return (print_str("(null)"));
 	for (i = 0; str[i]; i++)
 	{
-		if (str[i] < 32 || str[i] >= 127)
+		if (str[i] > 0 && (str[i] < 32 || str[i] >= 127))
 		{
-			hex[0] = '\\';
-			hex[1] = 'x';
-			hex[2] = '\0';
+			print_str("\\x");
+			count += 2;
+			hex  = print_hex_n(str[i], 16, 0);
+			if (!hex[1])
+				count += _putchar('0');
 			count += print_str(hex);
-			count += print_hex_n((unsigned char)str[i]);
-			str++;
 		}
 		else
 			count += _putchar(str[i]);

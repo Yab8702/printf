@@ -24,15 +24,16 @@ int print_unsi_helper(unsigned int n)
 /**
  * print_unsi - prints an unsigned decimal (base 10) integer
  * @args: the argument to print
- *
+ * @f: pointer to struct flags
  * Return: the number of characters printed
  */
 
-int print_unsi(va_list args)
+int print_unsi(va_list args, flags_t *f)
 {
 	unsigned int n = va_arg(args, unsigned int);
 	int len = 0;
 
+	(void)f;
 	if (n / 10)
 		len += print_unsi_helper(n / 10);
 	_putchar((n % 10) + '0');
